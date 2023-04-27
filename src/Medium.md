@@ -72,6 +72,9 @@ type MyReadonly2<T, K extends keyof T = keyof T> = {
 } & {
   [key in keyof Omit<T, K>]: T[key]
 }
+//等价于
+type MyReadonly2<T, K extends keyof T = keyof T> = 
+Readonly<Pick<T, K>> & Omit<T, K>
 
 //若这样写：
 type MyReadonly2<T, K extends keyof T = keyof T> = Readonly<T> & {
