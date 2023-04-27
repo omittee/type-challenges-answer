@@ -10,5 +10,6 @@ solution of [type-challenges](https://github.com/type-challenges/type-challenges
 ### 注意
 1. 一些实现参考了官方issue的题解
 2. 解答可能有时效性（说不定又有新的样例卡答案）
-3. 如果有错误欢迎指正
-4. 目前暂时完成Easy与Medium
+3. 文章偏笔记形式，个别表述可能不够严谨，如果有错误欢迎指正
+4. 题目顺序会有些调整，相似的题目会放在一起
+5. 目前暂时完成Easy与Medium
