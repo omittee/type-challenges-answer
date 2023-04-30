@@ -867,7 +867,7 @@ S extends `${infer L}.${infer R}`
 >
 ```
 
-## DeepPick
+## DropString
 
 ```tsx
  //示例
