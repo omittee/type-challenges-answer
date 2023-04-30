@@ -566,14 +566,14 @@ type AnyOf<T extends readonly any[]> = true extends (T[number] extends Falsy ? n
     ```tsx
     //最终
     T extends T 
-        ? [U] extends [T] 
+        ? [U] extends [T] //U为联合类型则false，选择true分支
           ? false 
           : true 
         : never;
     //解析为
-    false | false | false | ... 
+    true | true | true | ... 
     //即
-    false
+    true
     ```
     
     如果T不是联合类型的话不会触发分布式条件类型，因此`T extends T` 、`[U] extends [T]` 都为true，结果返回false
@@ -1648,6 +1648,7 @@ M extends []
 ```
 
 ## JSONSchema2TS
+
 ```tsx
  //示例
 type Type14 = JSONSchema2TS<{
