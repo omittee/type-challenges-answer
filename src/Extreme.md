@@ -247,8 +247,8 @@ type IntCompare<  //字典序与长度综合比较
     ? Pre
     : A extends '' ? Comparison.Lower : Comparison.Greater
 
-///仅比较字典序
-type DecimalCompare<A extends string, B extends string> = 
+
+type DecimalCompare<A extends string, B extends string> =   ///仅比较字典序
 `${A}|${B}` extends `${infer LA}${infer RA}|${infer LB}${infer RB}`
   ? LA extends LB ? DecimalCompare<RA, RB> : DigitCompare<LA, LB>
   : A extends B
@@ -612,7 +612,7 @@ NumToTuple<M> extends [...NumToTuple<S>, ...infer R] ? R['length'] : never
 
 ## Tag
 
-- 对象加可选属性
+- 对象加可选属性以及 T | T & U都能与T相互赋值
 
 ```tsx
  //示例
