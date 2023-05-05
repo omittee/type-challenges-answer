@@ -657,12 +657,14 @@ ToNumber<'0'>// 0
 ToNumber<'0@7'>// never
 
 //实现
+type ToNumber<S extends string> = S extends `${infer L extends number}` ? L : never
+
+//忽略前导0的实现
 type ToNumber<T extends string> = 
 T extends `0${infer L}` 
   ? L extends '' ? 0 : ToNumber<`${L}`> 
   : T extends `${infer R extends number}` ? R : never
 
-type ToNumber<S extends string> = S extends `${infer L extends number}` ? L : never
 ```
 
 ## ValidDate
