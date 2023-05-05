@@ -722,93 +722,40 @@ S extends `${infer L}${C}${infer R}` ? DropChar<`${L}${R}`, C> : S
 
 ## MinusOne
 
-- 相当复杂
-
 ```tsx
  //示例
 type Zero = MinusOne<1> // 0
 type FiftyFour = MinusOne<55> // 54
 
 //实现
-type NumberLiteral = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
-type MinusOneMap = {
-  "0": 9
-  "1": 0
-  "2": 1
-  "3": 2
-  "4": 3
-  "5": 4
-  "6": 5
-  "7": 6
-  "8": 7
-  "9": 8
-}
-type PlusOneMap = {
-  "0": 1
-  "1": 2
-  "2": 3
-  "3": 4
-  "4": 5
-  "5": 6
-  "6": 7
-  "7": 8
-  "8": 9
-  "9": 0
-}
+//支持number范围内整数减1操作（若用字符串表示则是不限范围的整数）
+type Reverse<A extends string, Res extends string = ""> = 
+  A extends `${infer L}${infer R}` ? Reverse<R,`${L}${Res}`> : Res
 
-type StringToArray<T extends string> = T extends `${infer F}${infer R}`
-  ? [F, ...StringToArray<R>]
-  : []
-type NumberToString<T extends number> = `${T}`
+type ToNumber<T extends string> = 
+T extends `0${infer L}` 
+  ? L extends '' ? 0 : ToNumber<`${L}`> 
+  : T extends `${infer R extends number}` ? R : never
 
-type RemoveStartWithZeros<S extends string> = S extends "0"
-  ? S
-  : S extends `${0}${infer Rest}`
-    ? `${RemoveStartWithZeros<Rest>}`
-    : S
+type DigsNext<S = '0123456789', Res = {}> = 
+  S extends `${infer L}${infer M}${infer R}`
+    ? DigsNext<`${M}${R}`, Res & Record<L, M>> : Omit<Res, never>
+type DigsPrev = {[K in keyof DigsNext as DigsNext[K]]: K}
 
-type ReverseString<S extends string> = S extends `${infer First}${infer Rest}`
-  ? `${ReverseString<Rest>}${First}`
-  : ""
-
-type RemoveUnit<S extends string> = S extends `${infer F}${infer R}`
-  ? F extends `${number}`
-    ? `${F}${RemoveUnit<R>}`
-    : `${RemoveUnit<R>}`
-  : S
-
-type Initial<S extends string> = ReverseString<S> extends `${infer _}${infer Rest}`
-  ? `${ReverseString<Rest>}`
-  : S
-
-type MinusOneForString<S extends string, T extends string = Initial<S>> = S extends `${T}${infer Last extends NumberLiteral}`
-  ? Last extends '0'
-    ? `${MinusOneForString<T>}${MinusOneMap[Last]}`
-    : `${T}${MinusOneMap[Last]}`
-  : never
-
-type PlusOneForString<S extends string, T extends string = Initial<S>> = S extends `${T}${infer Last extends NumberLiteral}`
-  ? Last extends '9'
-    ? T extends '9'
-      ? `${1}${PlusOneForString<T>}${PlusOneMap[Last]}`
-      : `${PlusOneForString<T>}${PlusOneMap[Last]}`
-    : `${T}${PlusOneMap[Last]}`
-  : S
-
-type GetSignSymbol<T extends string> = T extends `${infer _F extends '-'}${infer _L extends number}`
-  ? '-'
-  : '+'
-
-type ParseInt<T extends string> =
-  RemoveStartWithZeros<T> extends `${infer Digit extends number}`
-    ? Digit
+type AddOne<A extends string, Res extends string = ""> = 
+  A extends `${infer L}${infer R}` 
+    ? L extends keyof DigsNext ? `${Res}${DigsNext[L]}${R}` : AddOne<R, `${Res}0`>
+    : `${Res}1`
+type SubOne<A extends string, Res extends string = ""> = 
+  A extends `${infer L}${infer R}`
+    ? L extends keyof DigsPrev ? `${Res}${DigsPrev[L]}${R}` : SubOne<R, `${Res}9`>
     : never
 
-type MinusOne<T extends number, S = GetSignSymbol<`${T}`>> = T extends 0
-  ? -1
-  : S extends '+'
-    ? ParseInt<MinusOneForString<NumberToString<T>>>
-    : ParseInt<PlusOneForString<NumberToString<T>>>
+type MinusOne<T extends number> = 
+ToNumber<
+  `${T}` extends `-${infer N}` | '0'
+  ? `-${Reverse<AddOne<Reverse<N>>>}` : Reverse<SubOne<Reverse<`${T}`>>>
+>
 ```
 
 ## PickByType / OmitByType
