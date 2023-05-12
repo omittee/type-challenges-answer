@@ -1653,3 +1653,22 @@ T extends { type: 'object' }
         : T extends { type: 'number' } ? number 
           : T extends { type: 'boolean' } ? boolean : T
 ```
+
+## Square
+
+- 要通过100的样例需要实现Extreme的Multiply
+
+```tsx
+ //示例
+type a = Square<100> // 10000
+
+//实现
+type Multiply = ... 
+
+type ToNumber<S extends string> = S extends `${infer N extends number}` ? N : never
+
+type Absolute<N extends number> = 
+`${N}` extends `-${infer R extends number}` ? R : N;
+
+type Square<N extends number> = ToNumber<Multiply<Absolute<N>, Absolute<N>>>
+```
