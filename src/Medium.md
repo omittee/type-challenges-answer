@@ -1672,3 +1672,17 @@ type Absolute<N extends number> =
 
 type Square<N extends number> = ToNumber<Multiply<Absolute<N>, Absolute<N>>>
 ```
+
+## CartesianProduct
+
+```tsx
+ //示例
+CartesianProduct<1 | 2, 'a' | 'b'> 
+// [1, 'a'] | [2, 'a'] | [1, 'b'] | [2, 'b']
+
+//实现
+type CartesianProduct<T, U> = 
+T extends any
+  ? U extends any ? [T, U] : never
+  : never
+```
