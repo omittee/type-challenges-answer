@@ -1673,6 +1673,18 @@ type Absolute<N extends number> =
 type Square<N extends number> = ToNumber<Multiply<Absolute<N>, Absolute<N>>>
 ```
 
+## Triangular
+
+```tsx
+ //示例
+Triangular<10>  // 55
+
+//实现
+type Triangular<N extends number, Cnt extends any[] = [], Res extends any[] = []> = 
+N extends Cnt['length']
+  ? Res['length'] : Triangular<N, [...Cnt, 1], [...Res, ...Cnt, 1]>
+```
+
 ## CartesianProduct
 
 ```tsx
