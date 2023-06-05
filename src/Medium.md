@@ -1698,3 +1698,22 @@ T extends any
   ? U extends any ? [T, U] : never
   : never
 ```
+	
+## MergeAll
+
+```tsx
+ //示例
+type Foo = { a: 1; b: 2 }
+type Bar = { a: 2 }
+type Baz = { c: 3 }
+
+type Result = MergeAll<[Foo, Bar, Baz]> // { a: 1 | 2; b: 2; c: 3 }
+
+//实现
+type MergeAll<XS extends object[], Res = {}> = 
+XS extends [infer L, ...infer R extends object[]]
+  ? MergeAll<R, Omit<Res, keyof L> & { 
+      [p in keyof L]: p extends keyof Res ? L[p] | Res[p] : L[p] 
+    }>
+  : Omit<Res, never>;
+```
