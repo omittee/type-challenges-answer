@@ -153,10 +153,10 @@ type ExampleType = Promise<string>
 
 type Result = MyAwaited<ExampleType> // string
 //实现
-type MyAwaited<T extends PromiseLike<**any**> > = T extends PromiseLike<infer P> ? (P extends PromiseLike<unknown> ? MyAwaited<P> : P) : never;
+type MyAwaited<T extends PromiseLike<any> > = T extends PromiseLike<infer P> ? (P extends PromiseLike<unknown> ? MyAwaited<P> : P) : never;
 
 //如果改为:
-type MyAwaited<T extends PromiseLike<**unknown**> > = T extends PromiseLike<infer P> ? (P extends PromiseLike<unknown> ? MyAwaited<P> : P) : never;
+type MyAwaited<T extends PromiseLike<unknown> > = T extends PromiseLike<infer P> ? (P extends PromiseLike<unknown> ? MyAwaited<P> : P) : never;
 //则无法通过样例：
 type T = { then: (onfulfilled: (arg: number) => any) => any }
 ```
@@ -196,7 +196,9 @@ type Unshift<T extends Array<unknown>, U> = [U, ...T]
 ```tsx
 //示例
 const foo = (arg1: string, arg2: number): void => {}
-type FunctionParamsType = MyParameters<typeof foo> // [arg1: string, arg2: number]//实现
+type FunctionParamsType = MyParameters<typeof foo> 
+// [arg1: string, arg2: number]
+
 //实现
 type MyParameters<T extends (...args: any[]) => any> = 
 T extends (...args: infer P) => any ? P : never
