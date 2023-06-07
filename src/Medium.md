@@ -1717,3 +1717,32 @@ XS extends [infer L, ...infer R extends object[]]
     }>
   : Omit<Res, never>;
 ```
+	
+## CheckRepeatedTuple
+
+```tsx
+ //示例
+type CheckRepeatedTuple<[1, 2, 3]>   // false
+type CheckRepeatedTuple<[1, 2, 1]>   // true
+
+//实现1
+type CheckRepeatedTuple<T extends unknown[], Pre = never> = 
+T extends [infer L, ...infer R]
+  ? L extends Pre ? true : CheckRepeatedTuple<R, Pre | L>
+  : false
+//上述实现无法通过以下样例：
+CheckRepeatedTuple<[number, 1]> //true 实际应为false
+CheckRepeatedTuple<[never]> //never 实际应为false
+CheckRepeatedTuple<[any]> //boolean 实际应为false
+
+//实现2
+type isInTuple<T extends unknown, U extends unknown[]> = 
+U extends [infer L, ...infer R]
+  ? Equal<T, L> extends true ? true : isInTuple<T, R>
+  : false
+
+type CheckRepeatedTuple<T extends unknown[], Pre extends unknown[] = []> = 
+T extends [infer L, ...infer R]
+  ? isInTuple<L, Pre> extends true ? true : CheckRepeatedTuple<R, [...Pre, L]>
+  : false
+```
