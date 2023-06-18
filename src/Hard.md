@@ -1338,3 +1338,31 @@ IsUnion<T> extends true
     ? true 
     : number extends T ? never : false
 ```
+
+## OptionalUndefined
+
+```tsx
+ //示例
+OptionalUndefined<{ value: string | undefined, description: string }>
+// { value?: string | undefined; description: string }
+
+OptionalUndefined<{ 
+	value: string | undefined, 
+	description: string | undefined, 
+	author: string | undefined 
+}, 'description' | 'author'>
+/* { 
+	value: string | undefined; 
+	description?: string | undefined; 
+	author?: string | undefined; 
+} */
+
+//实现
+type GetUndefinedKey<T> = 
+keyof { [p in keyof T as undefined extends T[p] ? p : never]: T[p]; }
+
+type OptionalUndefined<
+  T, Props extends keyof T = keyof T, 
+  U extends keyof T = GetUndefinedKey<T> & Props
+> = Omit<Omit<T, U> & Partial<Pick<T, U>>, never>
+```
