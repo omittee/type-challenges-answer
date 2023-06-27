@@ -1746,3 +1746,15 @@ T extends [infer L, ...infer R]
   ? isInTuple<L, Pre> extends true ? true : CheckRepeatedTuple<R, [...Pre, L]>
   : false
 ```
+
+## PublicType
+
+```tsx
+ //示例
+PublicType<{ _h: number; i: unknown }> // { i: unknown }
+
+//实现
+type PublicType<T extends object> = {
+  [p in keyof T as p extends `_${string}` ? never : p]: T[p]; 
+}
+```
