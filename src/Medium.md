@@ -1758,3 +1758,15 @@ type PublicType<T extends object> = {
   [p in keyof T as p extends `_${string}` ? never : p]: T[p]; 
 }
 ```
+
+## ExtractToObject
+
+```tsx
+ //示例
+type Test = { id: '1', myProp: { foo: '2' }}
+type Result = ExtractToObject<Test, 'myProp'> // { id: '1', foo: '2' }
+
+//实现
+type ExtractToObject<T extends Object, U extends keyof T> = 
+Omit<T[U] & Omit<T, U>, never>
+```
