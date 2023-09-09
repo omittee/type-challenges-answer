@@ -1770,3 +1770,28 @@ type Result = ExtractToObject<Test, 'myProp'> // { id: '1', foo: '2' }
 type ExtractToObject<T extends Object, U extends keyof T> = 
 Omit<T[U] & Omit<T, U>, never>
 ```
+
+## DeepOmit
+
+```tsx
+ //示例
+type obj = {
+  person: {
+    name: string;
+    age: {
+      value: number
+    }
+  }
+}
+
+type test1 = DeepOmit<obj, 'person'>    // {}
+type test2 = DeepOmit<obj, 'person.name'> // { person: { age: { value: number } } }
+type test3 = DeepOmit<obj, 'name'> // { person: { name: string; age: { value: number } } }
+type test4 = DeepOmit<obj, 'person.age.value'> // { person: { name: string; age: {} } }
+
+//实现
+type DeepOmit<T, K extends string> =
+K extends `${infer L}.${infer R}`
+  ? { [p in keyof T]: p extends L ? DeepOmit<T[p], R> : T[p] }
+  : Omit<T, K>;
+```
