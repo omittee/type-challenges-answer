@@ -1376,9 +1376,9 @@ BitwiseXOR<'1','1'> // '0'
 BitwiseXOR<'10','1'>  // '11'
 
 //实现
-type reverse<S extends string, Res extends string = ""> = 
+type Reverse<S extends string, Res extends string = ""> = 
 S extends `${infer L}${infer R}`
-  ? reverse<R, `${L}${Res}`> : Res
+  ? Reverse<R, `${L}${Res}`> : Res
 
 type XOR<S1 extends string, S2 extends string, Res extends string = ""> = 
 S1 extends `${infer L1}${infer R1}`
@@ -1388,5 +1388,5 @@ S1 extends `${infer L1}${infer R1}`
   : `${Res}${S2}`
 
 type BitwiseXOR<S1 extends string, S2 extends string> = 
-reverse<XOR<reverse<S1>, reverse<S2>>>
+Reverse<XOR<Reverse<S1>, Reverse<S2>>>
 ```
