@@ -1366,3 +1366,27 @@ type OptionalUndefined<
   U extends keyof T = GetUndefinedKey<T> & Props
 > = Omit<Omit<T, U> & Partial<Pick<T, U>>, never>
 ```
+
+## BitwiseXOR
+
+```tsx
+ //示例
+BitwiseXOR<'0','1'> // '1'
+BitwiseXOR<'1','1'> // '0'
+BitwiseXOR<'10','1'>  // '11'
+
+//实现
+type reverse<S extends string, Res extends string = ""> = 
+S extends `${infer L}${infer R}`
+  ? reverse<R, `${L}${Res}`> : Res
+
+type XOR<S1 extends string, S2 extends string, Res extends string = ""> = 
+S1 extends `${infer L1}${infer R1}`
+  ? S2 extends `${infer L2}${infer R2}`
+    ? XOR<R1, R2, `${Res}${L1 extends L2 ? 0 : 1}`>
+    : `${Res}${S1}`
+  : `${Res}${S2}`
+
+type BitwiseXOR<S1 extends string, S2 extends string> = 
+reverse<XOR<reverse<S1>, reverse<S2>>>
+```
