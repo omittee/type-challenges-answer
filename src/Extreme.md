@@ -856,3 +856,34 @@ Parse<'{ 1: "world" }'> // never
 Parse<'["1"]'> // ["1"]
 Parse<'[1]'> // never
 ```
+
+## **CountReversePairs**
+
+```tsx
+ //示例
+CountReversePairs<[5, 2, 6, 1]> // 4
+CountReversePairs<[1, 2, 3, 4]> // 0
+CountReversePairs<[-1, -1]> // 0
+CountReversePairs<[-1]> // 0
+
+//实现
+type AbsReverses<X extends number, Y extends number, A extends 1[] = []> = 
+A['length'] extends X
+  ? 0
+  : A['length'] extends Y ? 1 : AbsReverses<X, Y, [...A, 1]>;
+
+type Reverses<A extends number, B extends number> = 
+`${A}` extends `-${infer X extends number}`
+  ? `${B}` extends `-${infer Y extends number}` ? AbsReverses<Y, X> : 0
+  : `${B}` extends `-${number}` ? 1 : AbsReverses<A, B>;
+
+type CountReverseWith<N extends number, A extends number[], R extends 1[] = []> = 
+A extends [infer F extends number, ...infer T extends number[]]
+  ? CountReverseWith<N, T, Reverses<N, F> extends 0 ? R : [...R, 1]>
+  : R;
+
+type CountReversePairs<A extends number[], R extends 1[] = []> = 
+A extends [infer F extends number, ...infer T extends number[]]
+  ? CountReversePairs<T, [...R, ...CountReverseWith<F, T>]>
+  : R['length'];
+```
