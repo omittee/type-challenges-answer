@@ -1829,3 +1829,62 @@ type Hanoi<
       ...Hanoi<N, Intermediate, To, From, [...Cnt, 1]>
     ]
 ```
+
+## Pascal
+
+```tsx
+Pascal<3>
+/*
+[
+  [1],
+  [1, 1],
+  [1, 2, 1],
+]
+*/
+
+//实现
+type Sum<
+A extends number, B extends number, 
+CntA extends any[] = [], CntB extends any[] = []
+> = 
+CntA['length'] extends A 
+  ? CntB['length'] extends B 
+    ? [...CntA, ...CntB]['length'] 
+    : Sum<A, B, CntA, [...CntB, 1]>
+  : Sum<A, B, [...CntA, 1], CntB>;
+
+type GetArr<PreArr extends number[], Res extends number[] = [1]> = 
+PreArr extends [infer L extends number, ...infer P extends number[]]
+? P extends [infer M extends number, ...infer R extends number[]]
+  ? GetArr<[M, ...R],[...Res, Sum<L, M>]>
+  : GetArr<P, [...Res, 1]>
+: Res
+
+type Pascal<N extends number, Cnt extends 1[] = [], Res extends number[][] = [[1]]> = 
+Res['length'] extends N
+? Res
+: Pascal<N, [...Cnt, 1], [...Res, GetArr<Res[Cnt['length']]>]>
+```
+
+## IsFixedStringLiteralType
+
+```tsx
+IsFixedStringLiteralType<`ABC${boolean}`> // false
+IsFixedStringLiteralType<`ABC${true}`> // true
+IsFixedStringLiteralType<`ABC${false}`> // true
+
+//实现
+type SingleCheck<S> = S extends ''
+  ? true
+  : S extends `${infer C}${infer T}`
+    ? '0' | '1' extends C
+      ? false : SingleCheck<T>
+    : false;
+
+type IsFixedStringLiteralType<S extends string, T = S> = [S] extends [never]
+  ? false
+  : S extends unknown
+    ? [T] extends [S] 
+      ? SingleCheck<S> : false
+    : false;
+```
