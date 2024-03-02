@@ -1390,3 +1390,25 @@ S1 extends `${infer L1}${infer R1}`
 type BitwiseXOR<S1 extends string, S2 extends string> = 
 Reverse<XOR<Reverse<S1>, Reverse<S2>>>
 ```
+
+## **Unbox**
+
+```tsx
+ //示例
+Unbox<string> // string
+Unbox<() => number> // number
+Unbox<boolean[]> // boolean
+Unbox<Promise<boolean>> // boolean
+Unbox<() => () => () => () => number> // number
+Unbox<() => () => () => () => number, 3> // () => number
+
+//实现
+type Unbox<T, N extends number = 0, Cnt extends any[] = [1]> = 
+T extends Array<infer U> 
+  ? Cnt['length'] extends N ? U : Unbox<U, N, [...Cnt, 1]>
+  : T extends () => infer U
+      ? Cnt['length'] extends N ? U : Unbox<U, N, [...Cnt, 1]>
+      : T extends Promise<infer U>
+          ? Cnt['length'] extends N ? U : Unbox<U, N, [...Cnt, 1]>
+          : T
+```
