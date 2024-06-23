@@ -887,3 +887,49 @@ A extends [infer F extends number, ...infer T extends number[]]
   ? CountReversePairs<T, [...R, ...CountReverseWith<F, T>]>
   : R['length'];
 ```
+
+## IntersectParameters
+
+```tsx
+ //示例
+IntersectParameters<[], []> // []
+IntersectParameters<[('a' | 'b' | 'c')?], [string, 1 | 2 | 3]> // ['a' | 'b' | 'c', 1 | 2 | 3]
+IntersectParameters<[{ a: 0 }?], [{ b: 1 }?]> // [{ a: 0, b: 1 }?]
+IntersectParameters<[{ a: 0 }, { b: 1 }], { c: 2 }[]>
+/*
+[
+  {
+    a: 0
+    c: 2
+  },
+  {
+    b: 1
+    c: 2
+  },
+  ...{
+    c: 2
+  }[],
+]
+*/
+
+//实现
+type Intersect<A extends unknown, B extends unknown> =
+[A, B] extends [object, object] 
+  ? { [k in keyof (A & B)]: (A & B)[k] }
+  : A & B
+
+type IntersectParameters<
+    l extends readonly unknown[],
+    r extends readonly unknown[],
+    R extends readonly unknown[] = []
+> = 
+l extends []
+  ? [...R, ...r]
+  : r extends []
+    ? [...R, ...l]
+    : [l, r] extends [[(infer LA)?, ...infer LB], [(infer RA)?, ...infer RB]]
+        ? '0' extends (keyof l) | (keyof r)
+          ? IntersectParameters<LB, RB, [[], []] extends [l, r] ? [...R, Intersect<LA, RA>?] : [...R, Intersect<LA, RA>]>
+          : [...R, ...Intersect<LA, RA>[]]
+        : never
+```
