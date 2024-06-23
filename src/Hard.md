@@ -1412,3 +1412,21 @@ T extends Array<infer U>
           ? Cnt['length'] extends N ? U : Unbox<U, N, [...Cnt, 1]>
           : T
 ```
+
+## BinaryAdd
+
+```tsx
+ //示例
+BinaryAdd<[1], [1]> // [1, 0]
+BinaryAdd<[0], [1]> // [1]
+
+//实现
+type Bit = 1 | 0;
+type Shifts = '011' | '101' | '110' | '111';
+type Ones = '001' | '010' | '100' | '111';
+
+type BinaryAdd<A extends Bit[], B extends Bit[], S extends Bit = 0, R extends Bit[] = []> = 
+  [A, B] extends [[...infer AR extends Bit[], infer X extends Bit], [...infer BR extends Bit[], infer Y extends Bit]]
+    ? BinaryAdd<AR, BR, `${S}${X}${Y}` extends Shifts ? 1 : 0, [`${S}${X}${Y}` extends Ones ? 1 : 0, ...R]>
+    : S extends 1 ? [1, ...R] : R;
+```
