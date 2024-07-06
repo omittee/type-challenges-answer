@@ -933,3 +933,33 @@ l extends []
           : [...R, ...Intersect<LA, RA>[]]
         : never
 ```
+
+## DynamicRoute
+
+```tsx
+// 示例
+DynamicRoute<`/blog/[slug]/page.js`> // { slug: string }
+DynamicRoute<`/shop/[...slug]/page.js`> // { slug: string[] }
+DynamicRoute<`/shop/[[...slug]]/page.js`> // { slug?: string[] }
+DynamicRoute<`/[categoryId]/[itemId]/page.js`> // { categoryId: string, itemId: string }
+DynamicRoute<`/app/[...foo]/[...bar]`> // never`
+DynamicRoute<`/[[...foo]]/[slug]/[...bar]`> // never`
+DynamicRoute<`/[first]/[[...foo]]/stub/[...bar]/[last]`> // { first: string, foo?: string[], bar: string[], last: string } 
+
+// 实现
+type Extract<T extends string> = 
+T extends `...${infer F}`
+  ? F extends '' ? {} : Record<F, string[]>
+  : T extends '' ? {} : Record<T, string>;
+
+type DynamicRoute<T extends string, Res extends Record<string, string | string[]> = {}> = 
+T extends `${infer A}[...]${infer B}`
+  ? DynamicRoute<`${A}${B}`, Res & { '...': string }>
+  : T extends `${string}]/[...${string}`
+    ? never
+    : T extends `${infer A}[[${infer F}]]${infer B}`
+      ? DynamicRoute<`${A}${B}`, Res & Partial<Extract<F>>>
+      : T extends `${infer A}[${infer F}]${infer B}`
+        ? DynamicRoute<`${A}${B}`, Res & Extract<F>>
+        : Omit<Res, never>
+```
