@@ -1,6 +1,5 @@
 # Hard
-
-## SimpleVue
+## 6 SimpleVue
 
 - Data、Computed、Methods泛型参数进行同类型的约束
 - `ThisType<T & U>` 约束方法时方法的this为`T & U` ThisType可以与其他类型交叉使用
@@ -56,7 +55,7 @@ declare function SimpleVue<
 }): unknown
 ```
 
-## VueBasicProps
+## 213 VueBasicProps
 
 - `ResultType` 实现构造函数到实例的转换
 
@@ -150,7 +149,7 @@ declare function VueBasicProps<
 }): unknown
 ```
 
-## defineStore
+## 1290 defineStore
 
 ```tsx
  //示例
@@ -231,7 +230,7 @@ declare function defineStore<State, Getters, Actions>
 }): Actions & State & GettersReturnType<Getters>
 ```
 
-## Currying
+## 17 Currying
 
 ```tsx
  //示例
@@ -247,13 +246,12 @@ T extends (args: never) => any //传入的函数参数为空直接返回
   ? T
   : T extends (...args: infer A) => infer R
     ? A extends [infer X, ...infer Y] 
-      ? (arg: X) => Curried<(...args: Y) => R>
-      : R
+      ? (arg: X) => Curried<(...args: Y) => R> : R
     : never
 declare function Currying<T>(fn: T): Curried<T>
 ```
 
-## UnionToIntersection
+## 55 UnionToIntersection
 
 - 利用函数参数的性质：
     
@@ -289,7 +287,7 @@ type UnionToIntersection<U> =
   ? T : never
 ```
 
-## UnionToTuple
+## 730 UnionToTuple
 
 - 利用函数重载返回值特性
     
@@ -349,7 +347,7 @@ type UnionToTuple<T, Last = GetIntersectionLast<UnionToIntersectionFn<T>>> =
 [T] extends [never] ? [] : [...UnionToTuple<Exclude<T, Last>>, Last]
 ```
 
-## ObjectFromEntries
+## 2949 ObjectFromEntries
 
 - `Omit<T, never>`可以代替`{[p in keyof T]: T[p]}`
 - 可以直接遍历T
@@ -381,7 +379,7 @@ type ObjectFromEntries<T extends [PropertyKey, unknown]> = {
 }
 ```
 
-## GetRequired / GetOptional
+## 57 59 GetRequired / GetOptional
 
 - 可选的值的类型实际解释为联合一个undefined，但如果本身为undefined则不好区分
 - 本身undefined -?后变为never，所以Required解决了上述问题
@@ -405,7 +403,7 @@ type GetOptional<T extends object> = {
 type GetOptional<T extends object> = Omit<T, keyof GetRequired<T>>
 ```
 
-## RequiredKeys / OptionalKeys
+## 89 90 RequiredKeys / OptionalKeys
 
 ```tsx
  //示例
@@ -422,7 +420,7 @@ type GetOptional = ...
 type OptionalKeys<T extends object> = keyof GetOptional<T>
 ```
 
-## IsRequiredKey
+## 2857 IsRequiredKey
 
 - 套一个[]防止分布式条件类型
 
@@ -441,7 +439,7 @@ type GetOptional = ...
 type OptionalKeys<T extends object> = keyof GetOptional<T>
 ```
 
-## CapitalizeWords
+## 112 CapitalizeWords
 
 - Uppercase<Ch> extends Lowercase<Ch>判断是否为字母
 
@@ -460,7 +458,7 @@ S extends `${infer L}${infer R}`
   : Capitalize<P>
 ```
 
-## CapitalizeNestObjectKeys
+## 9775 CapitalizeNestObjectKeys
 
 ```tsx
  //示例
@@ -490,7 +488,7 @@ T extends any[]
     : T
 ```
 
-## SnakeCase
+## 19458 SnakeCase
 
 - `L extends Lowercase<L>` 而不是`UpperCase`以区分大写字母与非字母
 
@@ -506,7 +504,7 @@ S extends `${infer L}${infer R}`
   : Res
 ```
 
-## CamelCase
+## 114 CamelCase
 
 ```tsx
  //示例
@@ -526,7 +524,7 @@ S extends `${infer L}_${infer M}${infer R}`
   : Lowercase<S>
 ```
 
-## Camelize
+## 1383 Camelize
 
 ```tsx
  //示例
@@ -556,7 +554,7 @@ type Camelize<T extends object> = {
       : T[p] extends object ? Camelize<T[p]> : T[p]
 ```
 
-## ParsePrintFormat
+## 147 ParsePrintFormat
 
 ```tsx
  //示例
@@ -582,23 +580,24 @@ S extends `${infer L}%${infer M}${infer R}`
   : T
 ```
 
-## Format
+## 545 Format
 
 ```tsx
  //示例
-type FormatCase1 = Format<"%sabc"> // FormatCase1 : string => string
-type FormatCase2 = Format<"%s%dabc"> // FormatCase2 : string => number => string
-type FormatCase3 = Format<"sdabc"> // FormatCase3 :  string
-type FormatCase4 = Format<"sd%abc"> // FormatCase4 :  string
+type FormatCase1 = Format<"%sabc"> // string => string
+type FormatCase2 = Format<"%s%dabc"> // string => number => string
+type FormatCase3 = Format<"sdabc"> // string
+type FormatCase4 = Format<"sd%abc"> // string
 
 //实现
-type Format<T extends string, FormatMap = { d: number, s: string }> = 
+type Format<T extends string, FormatMap = { d: number, s: string }> =
 T extends `${infer L}%${infer M}${infer R}`
-  ? M extends keyof FormatMap ? (M: FormatMap[M]) => Format<R> : Format<R>
+  ? M extends keyof FormatMap 
+		? (M: FormatMap[M]) => Format<R> : Format<R>
   : string
 ```
 
-## IsAny
+## 223 IsAny
 
 ```tsx
  //示例
@@ -613,13 +612,14 @@ type IsAny<T> = 0 extends 1 & T ? true : false
 type IsAny<T> = [{}, T] extends [T, null] ? true : false;
 
 //any可以换为unknown
-type IsAny<T> = ((a: [any]) => [any]) extends (a: T) => [T] ? true : false;
+type IsAny<T> = 
+((a: [any]) => [any]) extends (a: T) => [T] ? true : false;
 
 type IsAny<T> =
-  [T] extends [never] ? false : keyof any extends keyof T ? true : false;
+[T] extends [never] ? false : keyof any extends keyof T ? true : false;
 ```
 
-## Get
+## 270 Get
 
 ```tsx
  //示例
@@ -647,7 +647,7 @@ K extends keyof T
     : never
 ```
 
-## ToNumber
+## 300 ToNumber
 
 - `S extends `${infer L extends number}`` 当S含前导0时只能推断出number，所以需要进行前导0的特判
 
@@ -667,7 +667,7 @@ T extends `0${infer L}`
 
 ```
 
-## ValidDate
+## 9155 ValidDate
 
 ```tsx
  //示例
@@ -711,12 +711,11 @@ Count['length'] extends Day
 type ValidDate<T extends string> =
   T extends `${infer M1}${infer M2}${infer D}`
   ? `${M1}${M2}` extends keyof Day
-    ? CheckDay<ToNumber<D>, Day[`${M1}${M2}`]>
-    : false
+    ? CheckDay<ToNumber<D>, Day[`${M1}${M2}`]> : false
   : false;
 ```
 
-## FilterOut
+## 399 FilterOut
 
 - `[L] extends [F]` 用[]包裹防止never参与分布式条件类型
 
@@ -731,7 +730,7 @@ T extends [infer L, ...infer R]
   : T;
 ```
 
-## Enum
+## 472 Enum
 
 - 注意交叉的顺序不同，最后结果顺序也不同
 
@@ -749,7 +748,7 @@ T extends readonly [...infer L extends readonly string[], infer R extends string
   : Readonly<U>
 ```
 
-## DeepObjectToUniq
+## 553 DeepObjectToUniq
 
 - 通过交叉一个symbol+不同的value类型达到unique效果
 
@@ -777,12 +776,11 @@ type T4 = Equal<keyof Foo & string, keyof UniqFoo & string> // true
 type DeepObjectToUniq<O extends object> = {
   [p in keyof O]: 
 		O[p] extends object 
-			? DeepObjectToUniq<O[p]> & { [k in symbol]: [O, p]} 
-			: O[p]
+			? DeepObjectToUniq<O[p]> & { [k in symbol]: [O, p]} : O[p]
 }  & { [k in symbol]: O}
 ```
 
-## LengthOfString
+## 651 31824 LengthOfString
 
 ```tsx
  //示例
@@ -792,11 +790,78 @@ type T0 = LengthOfString<"foo"> // 3
 //实现
 type LengthOfString<S extends string, Res extends string[] = []> = 
 S extends `${infer L}${infer R}`
-  ? LengthOfString<R, [...Res, L]> 
-  : Res['length']
+  ? LengthOfString<R, [...Res, L]> : Res['length']
+  
+// 示例
+// 需要支持1e6级别的字符数
+type Deced = [10, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+type Signum = Deced[number]
+type Reped<
+  S extends string,
+  C extends Signum,
+  R extends string = '',
+>
+  = (C extends 0
+    ? R
+    : Reped<S, Deced[C], `${R}${S}`>
+  )
+type t0 = 'k'
+type t1 = Reped<t0, 10>
+type t2 = Reped<t1, 10>
+type t3 = Reped<t2, 10>
+type t4 = Reped<t3, 10>
+type t5 = Reped<t4, 10>
+type t6 = Reped<t5, 10>
+type Gened<N extends string> = N extends `${''
+  }${infer N6 extends Signum
+  }${infer N5 extends Signum
+  }${infer N4 extends Signum
+  }${infer N3 extends Signum
+  }${infer N2 extends Signum
+  }${infer N1 extends Signum
+  }${infer N0 extends Signum
+  }` ? `${''
+  }${Reped<t6, N6>
+  }${Reped<t5, N5>
+  }${Reped<t4, N4>
+  }${Reped<t3, N3>
+  }${Reped<t2, N2>
+  }${Reped<t1, N1>
+  }${Reped<t0, N0>
+  }` : never
+  
+LengthOfString<Gened<'8414001'>> // 8414001
+
+// 实现
+type ToInt<S> = S extends `0${infer X}` ? ToInt<X> : S extends `${infer N extends number}` ? N : 0;
+
+type Q1 = string;
+type Q10 = `${Q1}${Q1}${Q1}${Q1}${Q1}${Q1}${Q1}${Q1}${Q1}${Q1 & {}}`;
+type Q100 = `${Q10}${Q10}${Q10}${Q10}${Q10}${Q10}${Q10}${Q10}${Q10}${Q10}`;
+type Q1000 = `${Q100}${Q100}${Q100}${Q100}${Q100}${Q100}${Q100}${Q100}${Q100}${Q100}`;
+type Q10k = `${Q1000}${Q1000}${Q1000}${Q1000}${Q1000}${Q1000}${Q1000}${Q1000}${Q1000}${Q1000}`;
+type Q100k = `${Q10k}${Q10k}${Q10k}${Q10k}${Q10k}${Q10k}${Q10k}${Q10k}${Q10k}${Q10k}`;
+
+type Len<S, Q extends string, R extends 1[] = []> = S extends `${Q}${infer T}`
+  ? Len<T, Q, [...R, 1]>
+  : [R['length'], S];
+
+type LengthOfString<S extends string> = Len<S, Q100k> extends [infer A extends number, infer S1]
+  ? Len<S1, Q10k> extends [infer B extends number, infer S2]
+    ? Len<S2, Q1000> extends [infer C extends number, infer S3]
+      ? Len<S3, Q100> extends [infer D extends number, infer S4]
+        ? Len<S4, Q10> extends [infer E extends number, infer S5]
+          ? Len<S5, Q1> extends [infer F extends number, string]
+            ? ToInt<`${A}${B}${C}${D}${E}${F}`>
+            : 0
+          : 0
+        : 0
+      : 0
+    : 0
+  : 0;
 ```
 
-## Join
+## 847 Join
 
 - 函数泛型参数应该设置在对应的函数才有用
     
@@ -821,7 +886,7 @@ declare function join<D extends string>(delimiter: D):
 <T extends string[]>(...parts: T) => Join<T, D>
 ```
 
-## DeepPick
+## 956 DeepPick
 
 ```tsx
  //示例
@@ -841,7 +906,7 @@ type obj = {
 type T1 = DeepPick<obj, 'name'>   // { name : 'hoge' }
 type T2 = DeepPick<obj, 'name' | 'friend.name'>  
 // { name : 'hoge' } & { friend: { name: 'fuga' }}
-type T3 = DeepPick<obj, 'name' | 'friend.name' |  'friend.family.name'>  
+type T3 = DeepPick<obj, 'name' | 'friend.name' | 'friend.family.name'> 
 /* { name : 'hoge' } &  { friend: { name: 'fuga' }} 
  & { friend: { family: { name: 'baz' }}} */
 
@@ -852,9 +917,7 @@ type UnionToIntersection<U> =
 
 type DeepPick<T, S extends string> = UnionToIntersection<
 S extends `${infer L}.${infer R}`
-  ? L extends keyof T
-    ? { [p in L]: DeepPick<T[p], R> }
-    : never
+  ? L extends keyof T ? { [p in L]: DeepPick<T[p], R> } : never
   : S extends keyof T ? { [p in S]: T[p] } : never
 >
 
@@ -869,7 +932,7 @@ S extends `${infer L}.${infer R}`
 >
 ```
 
-## DropString
+## 2059 DropString
 
 ```tsx
  //示例
@@ -882,7 +945,7 @@ S extends `${infer L}${infer R}`
   : S
 ```
 
-## Split
+## 2822 Split
 
 ```tsx
  //示例
@@ -898,7 +961,7 @@ string extends S
   : SEP extends '' ? [] : [S]
 ```
 
-## ClassPublicKeys
+## 2828 ClassPublicKeys
 
 - keyof 操作符返回public的key
 
@@ -919,7 +982,7 @@ type publicKyes = ClassPublicKeys<A> // 'str' | 'getNum'
 type ClassPublicKeys<T> = keyof T
 ```
 
-## IsPalindrome
+## 4037 IsPalindrome
 
 - 字符串也能直接比较首尾，只需先infer出L再在后面判断extends即可
 - ``${infer L}${string}${infer R}`` 特判一个字符的情况（直接不符合格式而返回true）
@@ -929,26 +992,24 @@ type ClassPublicKeys<T> = keyof T
 IsPalindrome<'abc'> // false
 IsPalindrome<121> // true
 
-//实现
-
+//实现1
 //缺点：IsPalindrome<string>返回true
 type StrToTuple<S extends string, Res extends string[] = []> = 
-S extends `${infer L}${infer R}`
-  ? StrToTuple<R, [...Res, L]> 
-  : Res
+S extends `${infer L}${infer R}` ? StrToTuple<R, [...Res, L]> : Res
+
 type IsPalindrome<T extends string | number, U extends any[] = StrToTuple<`${T}`>> = 
 U extends [infer L, ...infer M, infer R]
-  ? Equal<L, R> extends true
-    ? IsPalindrome<T, M>
-    : false
+  ? Equal<L, R> extends true ? IsPalindrome<T, M> : false
   : true
 
+//实现2
 //缺点：IsPalindrome<string>返回true
 type IsPalindrome<T extends string | number> = 
 `${T}` extends `${infer L}${string}${infer R}`
   ? `${T}` extends `${L}${infer M}${L}` ? IsPalindrome<M> : false
   : true
 
+//实现3
 type ReverseStr<S extends string, T extends string = ""> = 
 S extends `${infer L}${infer R}`
   ? ReverseStr<R, `${L}${T}`> 
@@ -957,7 +1018,7 @@ type IsPalindrome<T extends string | number> =
 `${T}` extends ReverseStr<`${T}`> ? true : false
 ```
 
-## MutableKeys
+## 5181 MutableKeys
 
 - extends不能区分，必须用Equal
 
@@ -973,7 +1034,7 @@ type MutableKeys<T> = keyof {
 }
 ```
 
-## Intersection
+## 5423 Intersection
 
 - unknown不能换成any, 任何包含any的交叉类型结果都是any
 
@@ -989,11 +1050,10 @@ type Res5 = Intersection<[[1, 2, 3], 2, 3]>; // never
 //实现
 type Intersection<T extends any[]> = 
 T extends [infer L, ...infer R]
-  ? (L extends any[] ? L[number] : L) & Intersection<R> 
-  : unknown
+  ? (L extends any[] ? L[number] : L) & Intersection<R>  : unknown
 ```
 
-## BinaryToDecimal
+## 6141 BinaryToDecimal
 
 ```tsx
  //示例
@@ -1007,7 +1067,7 @@ S extends `${infer L extends '0' | '1'}${infer R}`
   : Cnt['length'];
 ```
 
-## ObjectKeyPaths
+## 7258 ObjectKeyPaths
 
 ```tsx
  //示例
@@ -1023,19 +1083,19 @@ type T3 = ObjectKeyPaths<{ books: [{ name: string; price: number }] }>;
 
 //实现
 type Keys<T, IsTop, K extends string | number> =
-  IsTop extends true
-    ? K | (T extends unknown[] ? `[${K}]` : never)
-    : `.${K}` | (T extends unknown[] ? `[${K}]` | `.[${K}]` : never)
+IsTop extends true
+  ? K | (T extends unknown[] ? `[${K}]` : never)
+  : `.${K}` | (T extends unknown[] ? `[${K}]` | `.[${K}]` : never)
 
 type ObjectKeyPaths<T, IsTop = true, K extends keyof T = keyof T> =
-  K extends string | number
-    ? `${Keys<T, IsTop, K>}${
-      '' | (T[K] extends object ? ObjectKeyPaths<T[K], false> : '')
-      }`
-    : never
+K extends string | number
+  ? `${Keys<T, IsTop, K>}${
+    '' | (T[K] extends object ? ObjectKeyPaths<T[K], false> : '')
+    }`
+  : never
 ```
 
-## Path
+## 15260 Path
 
 ```tsx
  //示例
@@ -1069,7 +1129,7 @@ K extends any
   : never
 ```
 
-## TwoSum
+## 8804 TwoSum
 
 ```tsx
  //示例
@@ -1086,7 +1146,7 @@ CntA['length'] extends A
     : Sum<A, B, CntA, [...CntB, 1]>
   : Sum<A, B, [...CntA, 1], CntB>;
 
-type TwoSum<T extends number[], U extends number, P extends number = -1> = 
+type TwoSum<T extends number[], U extends number, P extends number = -1> =
 T extends [infer L extends number, ...infer R extends number[]]
   ? P extends -1 
     ? TwoSum<R, U, L> 
@@ -1108,7 +1168,7 @@ T extends [infer L extends number, ...infer R extends number[]]
   : false;
 ```
 
-## Assign
+## 9160 Assign
 
 ```tsx
  //示例
@@ -1154,7 +1214,7 @@ U extends [infer L, ...infer R]
   : T
 ```
 
-## Maximum / Minimum
+## 9384 Maximum / Minimum
 
 - `[U] extends [C['length']]` 套[]防止分布式条件类型，只有U只剩一个子段时才可能成立，若U为never，[never] extends [K] 永远为true（K是任意类型）
 - 当T为[]时T[number]为never
@@ -1181,7 +1241,7 @@ T extends []
   : C['length'] extends T[number] ? C['length'] : Minimum<T, [...C, 1]>;
 ```
 
-## UnionReplace
+## 13580 UnionReplace
 
 ```tsx
  //示例
@@ -1251,7 +1311,7 @@ U extends [[infer K, infer V], ...infer R extends [any, any][]]
 UnionReplace<(()=>number) | (()=>0), [[()=>number, never]]> // ()=>0
 ```
 
-## FizzBuzz
+## 14080 FizzBuzz
 
 ```tsx
  //示例
@@ -1276,7 +1336,7 @@ Res['length'] extends N
       : FizzBuzz<N, [...Res, `${Cnt['length']}`], [...Cnt, 1]>
 ```
 
-## Run-length encoding
+## 14188 Run-length encoding
 
 - ``${infer L extends number}${infer R}`` L每次只能取一个字符，所以需要GetPreNum抽出前缀所有位数字
 
@@ -1287,32 +1347,35 @@ type b = RLE.Decode<'11ACD2X'> // 'AAAAAAAAAAACDXX'
 
 //实现
 namespace RLE {
-  export type Encode<S extends string, Res extends string = "", Cnt extends 1[] = [1]> = 
-  S extends `${infer L}${infer M}${infer R}`
-    ? L extends M 
-      ? Encode<`${M}${R}`, Res, [...Cnt, 1]>
-      : Encode<`${M}${R}`, `${Res}${Cnt['length'] extends 1 ? '' :  Cnt['length']}${L}`, [1]>
-    : `${Res}${Cnt['length'] extends 1 ? '' :  Cnt['length']}${S}`
+  export type Encode<
+		S extends string, Res extends string = "", Cnt extends 1[] = [1]
+	> = S extends `${infer L}${infer M}${infer R}`
+	    ? L extends M 
+	      ? Encode<`${M}${R}`, Res, [...Cnt, 1]>
+	      : Encode<`${M}${R}`, `${Res}${Cnt['length'] extends 1 
+					? '' :  Cnt['length']}${L}`, [1]>
+	    : `${Res}${Cnt['length'] extends 1 ? '' :  Cnt['length']}${S}`
   
   type Repeat<
     S extends string, N extends Number,
-    Cnt extends 1[] = [], Res extends string = ""> = 
-  Cnt['length'] extends N ? Res : Repeat<S, N, [...Cnt, 1], `${Res}${S}`>
+    Cnt extends 1[] = [], Res extends string = ""
+	> = Cnt['length'] extends N 
+			? Res : Repeat<S, N, [...Cnt, 1], `${Res}${S}`>
 
   type GetPreNum<S extends string, Res extends string = ""> = 
   S extends `${infer L extends number}${infer R}`
-    ? GetPreNum<R, `${Res}${L}`> : Res extends `${infer T extends number}` ? T : 1;
+    ? GetPreNum<R, `${Res}${L}`> 
+		: Res extends `${infer T extends number}` ? T : 1;
 
   export type Decode<
     S extends string, Res extends string = "",
     N extends number = GetPreNum<S>
-  > = 
-  S extends `${N extends 1 ? '' : N}${infer L}${infer R}`
-    ? Decode<R, `${Res}${Repeat<L, N>}`> : `${Res}${S}`
+  > = S extends `${N extends 1 ? '' : N}${infer L}${infer R}`
+	    ? Decode<R, `${Res}${Repeat<L, N>}`> : `${Res}${S}`
 }
 ```
 
-## IsNegativeNumber
+## 25747 IsNegativeNumber
 
 ```tsx
  //示例
@@ -1339,7 +1402,7 @@ IsUnion<T> extends true
     : number extends T ? never : false
 ```
 
-## OptionalUndefined
+## 28143 OptionalUndefined
 
 ```tsx
  //示例
@@ -1367,7 +1430,33 @@ type OptionalUndefined<
 > = Omit<Omit<T, U> & Partial<Pick<T, U>>, never>
 ```
 
-## BitwiseXOR
+## 30178 uniqueItems
+
+使用函数对传入的参数进行校验
+
+```tsx
+ //示例
+declare const readonlyEqual: <A>() => <T>(value: T) => Equal<Readonly<A>, Readonly<T>>
+declare const expect: (value: true) => void
+
+// Should work
+expect(readonlyEqual<[1, 2, 3]>()(uniqueItems([1, 2, 3])))
+
+// @ts-expect-error
+uniqueItems([1, 2, 2, 3, 4, 4, 5, 6])
+
+//实现
+type UniqueItems<T, P extends unknown[] = []> =
+T extends [infer F, ...infer R]
+  ? UniqueItems<R, [...P, F extends P[number] ? never : F]>
+  : P extends T ? P : P
+
+function uniqueItems<const T>(items: UniqueItems<T>) {
+  return items
+}
+```
+
+## 30575 BitwiseXOR
 
 ```tsx
  //示例
@@ -1391,7 +1480,68 @@ type BitwiseXOR<S1 extends string, S2 extends string> =
 Reverse<XOR<Reverse<S1>, Reverse<S2>>>
 ```
 
-## **Unbox**
+## 31797 SudokuSolved
+
+```tsx
+ //示例
+SudokuSolved<[
+  [[1, 2, 3], [5, 6, 7], [4, 8, 9]],
+  [[4, 8, 9], [1, 2, 3], [5, 6, 7]],
+  [[5, 6, 7], [4, 8, 9], [1, 2, 3]],
+  [[3, 1, 2], [8, 5, 6], [9, 7, 4]],
+  [[7, 9, 4], [3, 1, 2], [8, 5, 6]],
+  [[8, 5, 6], [7, 9, 4], [3, 1, 2]],
+  [[2, 3, 1], [6, 4, 5], [7, 9, 8]],
+  [[9, 7, 8], [2, 3, 1], [6, 4, 5]],
+  [[6, 4, 5], [9, 7, 8], [2, 3, 1]],
+]> // true
+
+//实现
+type Digits = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+
+type SudokuSolved<Grid extends number[][][]> =
+  | CheckSubGrids<Grid>
+  | CheckRows<Grid[number]>
+  | CheckColumns<Grid[number]> extends true
+  ? true
+  : false
+
+type CheckSubGrids<Grid extends number[][][]> = Grid extends [
+  infer Grid1 extends number[][],
+  infer Gird2 extends number[][],
+  infer Grid3 extends number[][],
+  ...infer Rest extends number[][][],
+]
+  ? CheckSubGrid<Grid1 | Gird2 | Grid3> extends true
+    ? CheckSubGrids<Rest> : false
+  : never
+
+type CheckSubGrid<
+  SubGrid extends number[][],
+  C extends number = 0 | 1 | 2,
+> = C extends C
+  ? Digits extends SubGrid[C][number]
+    ? true : false
+  : never
+
+type CheckRows<Rows extends number[][]> = 
+Rows extends Rows
+  ? Digits extends Rows[number][number]
+    ? true : false
+  : never
+
+type CheckColumns<
+  Rows extends number[][],
+  I extends number = 0 | 1 | 2,
+  J extends number = 0 | 1 | 2,
+> = I extends I
+  ? J extends J
+    ? Digits extends Rows[I][J] ? true : false
+    : never
+  : never
+```
+
+## **32427 Unbox**
 
 ```tsx
  //示例
@@ -1403,17 +1553,13 @@ Unbox<() => () => () => () => number> // number
 Unbox<() => () => () => () => number, 3> // () => number
 
 //实现
-type Unbox<T, N extends number = 0, Cnt extends any[] = [1]> = 
-T extends Array<infer U> 
-  ? Cnt['length'] extends N ? U : Unbox<U, N, [...Cnt, 1]>
-  : T extends () => infer U
-      ? Cnt['length'] extends N ? U : Unbox<U, N, [...Cnt, 1]>
-      : T extends Promise<infer U>
-          ? Cnt['length'] extends N ? U : Unbox<U, N, [...Cnt, 1]>
-          : T
+type Unbox<T, N = 0, Cnt extends any[] = [1]> = 
+T extends (() => infer R) | Array<infer R> | Promise<infer R>
+  ? Count['length'] extends N ? R : Unbox<R, N, [...Cnt, 1]>
+  : T
 ```
 
-## BinaryAdd
+## 32532 BinaryAdd
 
 ```tsx
  //示例
