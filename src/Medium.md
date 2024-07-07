@@ -1,6 +1,5 @@
 # Medium
-
-## MyReturnType
+## 2 MyReturnType
 
 ```tsx
 //示例
@@ -13,14 +12,16 @@ const fn = (v: boolean) => {
 
 type a = MyReturnType<typeof fn> // 应推导出 "1 | 2"
 //实现
-type MyReturnType<T> = T extends (...args: **any**[]) => infer P ? P : never
+type MyReturnType<T> = 
+T extends (...args: **any**[]) => infer P ? P : never
 
 //若为
-type MyReturnType<T> = T extends (...args: **unknown**[]) => infer P ? P : never
+type MyReturnType<T> = 
+T extends (...args: **unknown**[]) => infer P ? P : never
 //则示例过不了
 ```
 
-## MyOmit
+## 3 MyOmit
 
 - Exclude必须抽离出来，不能写成[p in (keyof T extends K ? never : keyof T)]: T[p]，因为这样不会进行分布式条件类型（联合类型不是泛型参数）
 
@@ -45,7 +46,7 @@ type MyOmit<T, K extends keyof T> = {
 }
 ```
 
-## Readonly 2
+## 8 Readonly 2
 
 - 交叉类型
 
@@ -89,7 +90,7 @@ interface Todo2 {
 MyReadonly2<Todo2, 'description'>
 ```
 
-## DeepReadonly / DeepMutable
+## 9 17973 DeepReadonly / DeepMutable
 
 ```tsx
 //示例
@@ -159,7 +160,7 @@ type DeepMutable<T extends object> = {
 }
 ```
 
-## TupleToUnion
+## 10 TupleToUnion
 
 ```tsx
 //示例
@@ -170,7 +171,7 @@ type Test = TupleToUnion<Arr> // expected to be '1' | '2' | '3'
 type TupleToUnion<T extends Array<unknown>> = T[number]
 ```
 
-## Chainable
+## 12 Chainable
 
 ```tsx
 //示例
@@ -219,7 +220,7 @@ type Expected3 = {
 }
 ```
 
-## Last
+## 15 Last
 
 ```tsx
 //示例
@@ -232,7 +233,7 @@ type tail2 = Last<arr2> // expected to be 1
 type Last<T extends any[]> = T extends [...any[], infer U] ? U : never;
 ```
 
-## Pop / Shift
+## 16 Pop / Shift
 
 ```tsx
 //示例
@@ -246,7 +247,7 @@ type Pop<T extends any[]> = T extends [...infer L, any] ? L : [];
 type Shift<T extends any[]> = T extends [any, ...infer R] ? R : []
 ```
 
-## PromiseAll
+## 20 PromiseAll
 
 ```tsx
 //示例
@@ -264,7 +265,7 @@ declare function PromiseAll<T extends unknown[]>(values: readonly [...T]): Promi
 }>
 ```
 
-## LookUp
+## 62 LookUp
 
 - 用extends在联合类型中筛选
 
@@ -284,10 +285,11 @@ interface Dog {
 type MyDog = LookUp<Cat | Dog, 'dog'> // expected to be `Dog`
 
 //实现
-type LookUp<U extends { type: unknown }, T extends U['type']> = U extends { type: T } ? U : never;
+type LookUp<U extends { type: unknown }, T extends U['type']> = 
+U extends { type: T } ? U : never;
 ```
 
-## TrimLeft / TrimRight / Trim
+## 106 4803 108 TrimLeft / TrimRight / Trim
 
 - 模板字符串、逐字符递归操作
 
@@ -299,40 +301,52 @@ type trimed = Trim<'  Hello World  '> // 应推导出 'Hello World'
 //实现
 type Whitespace = ' ' | '\n' | '\t'
 
-type TrimLeft<S extends string> = S extends `${Whitespace}${infer T}` ? TrimLeft<T> : S;
-type TrimRight<S extends string> = S extends `${infer T}${Whitespace}` ? TrimRight<T> : S;
+type TrimLeft<S extends string> = 
+S extends `${Whitespace}${infer T}` ? TrimLeft<T> : S;
 
-type Trim<S extends string> = S extends `${Whitespace}${infer T}` | `${infer T}${Whitespace}` ? Trim<T> : S;
+type TrimRight<S extends string> = 
+S extends `${infer T}${Whitespace}` ? TrimRight<T> : S;
+
+type Trim<S extends string> = 
+S extends `${Whitespace}${infer T}` | `${infer T}${Whitespace}` 
+	? Trim<T> : S;
 //或
 type Trim<S extends string> = TrimRight<TrimLeft<S>>
 ```
 
-## MyCapitalize
+## 110 MyCapitalize
 
-- 内置的****Uppercase，Lowercase****类型
-
-```tsx
-//示例
-type capitalized = Capitalize<'hello world'> // expected to be 'Hello world'
-
-//实现
-type MyCapitalize<S extends string> = S extends `${infer L}${infer R}` ? `${Uppercase<L>}${R}` : '';
-```
-
-## Replace / ReplaceAll
+- 内置的**Uppercase，Lowercase**类型
 
 ```tsx
 //示例
-type replaced = Replace<'types are fun!', 'fun', 'awesome'> // 期望是 'types are awesome!'
-type replaced = ReplaceAll<'t y p e s', ' ', ''> // 期望是 'types'
+type capitalized = Capitalize<'hello world'> // 'Hello world'
 
 //实现
-type Replace<S extends string, From extends string, To extends string> = S extends `${infer L}${From extends '' ? never : From}${infer R}` ? `${L}${To}${R}` : S;
-
-type ReplaceAll<S extends string, From extends string, To extends string> = From extends '' ? S : S extends `${infer L}${From}${infer R}` ? `${L}${To}${ReplaceAll<R, From, To>}` : S;
+type MyCapitalize<S extends string> = 
+S extends `${infer L}${infer R}` ? `${Uppercase<L>}${R}` : '';
 ```
 
-## AppendArgument
+## 116  119 Replace / ReplaceAll
+
+```tsx
+//示例
+type replaced = Replace<'types are fun!', 'fun', 'awesome'> // 'types are awesome!'
+type replaced = ReplaceAll<'t y p e s', ' ', ''> // 'types'
+
+//实现
+type Replace<S extends string, From extends string, To extends string> = 
+S extends `${infer L}${From extends '' ? never : From}${infer R}` 
+	? `${L}${To}${R}` : S;
+
+type ReplaceAll<S extends string, From extends string, To extends string> = 
+From extends '' 
+	? S 
+	: S extends `${infer L}${From}${infer R}` 
+		? `${L}${To}${ReplaceAll<R, From, To>}` : S;
+```
+
+## 191 AppendArgument
 
 ```tsx
 //示例
@@ -341,12 +355,15 @@ type Fn = (a: number, b: string) => number
 type Result = AppendArgument<Fn, boolean> // 期望是 (a: number, b: string, x: boolean) => number
 
 //实现
-type AppendArgument<Fn extends Function, A> = Fn extends (...args: infer P)=>infer R ? (...args: [...P, A]) => R : never;
+type AppendArgument<Fn extends Function, A> = 
+Fn extends (...args: infer P)=>infer R 
+	? (...args: [...P, A]) => R : never;
 //或  (注意这里Type 'Function' is not assignable to type '(...args: any) => any'，注意参数的any不能替换为unknown)
-type AppendArgument<Fn extends (...args: any[])=>any, A> =  (...args: [...Parameters<Fn>, A]) => ReturnType<Fn>;
+type AppendArgument<Fn extends (...args: any[])=>any, A> = 
+(...args: [...Parameters<Fn>, A]) => ReturnType<Fn>;
 ```
 
-## IsNever
+## 1042 IsNever
 
 - 对于T = never来说，应该使用`[T] extends [never]` 而不是`T extends never`,否则会按照分布式条件类型来执行，又由于never视为空的Union，分布式条件类型无法应用导致最终返回never
 
@@ -361,7 +378,7 @@ type E = IsNever<number> // expected to be false
 type IsNever<T> = [T] extends [never] ? true : false;
 ```
 
-## Permutation
+## 296 21220 Permutation/PermutationsOfTuple
 
 - K extends T 利用分布式条件类型
 - `K extends T ? [K, ...Permutation<Exclude<T, K>>]` 中第二个与第三个K是逐项拆分的子项
@@ -375,9 +392,31 @@ type Permutation<T, K = T> =
 [T] extends [never] 
 	? [] 
 	: K extends T ? [K, ...Permutation<Exclude<T, K>>] : never;
+	
+	
+// 示例
+PermutationsOfTuple<[any, unknown, never]> 
+/**
+| [any, unknown, never]
+| [unknown, any, never]
+| [unknown, never, any]
+| [any, never, unknown]
+| [never, any, unknown]
+| [never, unknown, any]
+ */
+
+// 实现
+type Insert<T extends unknown[], U> = 
+T extends [infer F,...infer L]
+  ? [F, U, ...L] | [F, ...Insert<L,U>] : [U]
+
+type PermutationsOfTuple<T extends unknown[], R extends unknown[] = []> = 
+T extends [infer F,...infer L] 
+  ? PermutationsOfTuple<L, Insert<R, F> | [F, ...R] >
+  : R
 ```
 
-## LengthOfString
+## 298 LengthOfString
 
 - 只有元组的length类型才是具体数字，数组与字符串的length类型是number，因此需要转为元组再求length
 
@@ -398,7 +437,7 @@ S extends `${infer L}${infer R}`
 	: T['length']
 ```
 
-## **Flatten**
+## **459 Flatten**
 
 ```tsx
 //示例
@@ -413,7 +452,7 @@ T extends [infer L, ...infer R]
   : []
 ```
 
-## AppendToObject
+## 527 AppendToObject
 
 - 映射类型不能同时有两个[p in q]
 - 交叉类型与同时具备两类object属性的obj类型不等价
@@ -436,27 +475,29 @@ type AppendToObject<T extends object, U extends PropertyKey, V> = {
 }
 ```
 
-## Absolute
+## 529 Absolute
 
 ```tsx
 //示例
 type Test = -100;
 type Result = Absolute<Test>; // expected to be "100"
 //实现
-type Absolute<T extends number | string | bigint> = `${T}` extends `-${infer R}` ? R : `${T}`;
+type Absolute<T extends number | string | bigint> = 
+`${T}` extends `-${infer R}` ? R : `${T}`;
 ```
 
-## StringToUnion
+## 531 StringToUnion
 
 ```tsx
 //示例
 type Test = '123';
 type Result = StringToUnion<Test>; // expected to be "1" | "2" | "3"
 //实现
-type StringToUnion<S extends string> = S extends `${infer L}${infer R}` ? L | StringToUnion<R> : never;
+type StringToUnion<S extends string> = 
+S extends `${infer L}${infer R}` ? L | StringToUnion<R> : never;
 ```
 
-## Merge
+## 599 Merge
 
 ```tsx
 //示例
@@ -473,15 +514,21 @@ type coo = {
 type Result = Merge<foo,coo>; // expected to be {name: string, age: number, sex: string}
 //实现
 type Merge<F, S> = {   //优先S再F，且不能直接F[p]，否则报错
-  [p in keyof F | keyof S]: p extends keyof S ? S[p] : p extends keyof F ? F[p] : never;
+  [p in keyof F | keyof S]: 
+		p extends keyof S 
+			? S[p] 
+			: p extends keyof F ? F[p] : never;
 }
 //也可以使用交叉类型
 type Merge<F, S> = {
-  [p in keyof (F & S)]: p extends keyof S ? S[p] : p extends keyof F ? F[p] : never;
+  [p in keyof (F & S)]: 
+		p extends keyof S 
+			? S[p] 
+			: p extends keyof F ? F[p] : never;
 }
 ```
 
-## KebabCase
+## 612 KebabCase
 
 - 首字母大写不用加’-’，使用需要一层判断(借助泛型参数T)
 - L extends Lowercase<L> 而不是Uppercase<L>，因为其他非字母字符 L === Uppercase<L> === Lowercase<L>，此时应不加’-’
@@ -511,7 +558,7 @@ type KebabCase<S extends string> =
     : S;
 ```
 
-## **Diff**
+## **645 Diff**
 
 ```tsx
 //示例
@@ -535,7 +582,7 @@ type Diff<T extends object, U extends object> = {
 type Diff<T extends object, U extends object> = Omit<T & U, keyof (T | U)>
 ```
 
-## AnyOf
+## 949 AnyOf
 
 - 可以不必使用infer逐个比较，而是用分布式条件类型
 
@@ -546,10 +593,11 @@ type Sample2 = AnyOf<[0, '', false, [], {}]> // expected to be false.
 //实现
 type Falsy = false | 0 | '' | [] | Record<PropertyKey, never> | undefined | null | never
 
-type AnyOf<T extends readonly any[]> = true extends (T[number] extends Falsy ? never : true) ? true : false;
+type AnyOf<T extends readonly any[]> = 
+true extends (T[number] extends Falsy ? never : true) ? true : false;
 ```
 
-## IsUnion
+## 1097 IsUnion
 
 - `T extends T` 触发条件式分布类型，后面的`[U] extends [T]` 中的T已经是逐项拆分的子项了：
     
@@ -589,13 +637,11 @@ type IsUnion<T, U = T> =
 [T] extends [never] 
   ? false 
   : T extends T 
-    ? [U] extends [T] 
-      ? false 
-      : true 
+    ? [U] extends [T] ? false : true 
     : never;
 ```
 
-## ReplaceKeys
+## 1130 ReplaceKeys
 
 ```tsx
 //示例
@@ -661,7 +707,7 @@ type P<T> = {
 */
 ```
 
-## RemoveIndexSignature
+## 1367 RemoveIndexSignature
 
 - as可以对K进一步操作
 - `PropertyKey extends keyof T[K]` 作用暂且未知
@@ -680,7 +726,7 @@ type RemoveIndexSignature<T> = {
 }
 ```
 
-## PercentageParser
+## 1978 PercentageParser
 
 - 使用泛型来复用L与R： `infer L extends '+' | '-' ? **L** : never;`会报错，L不能复用，因此使用泛型来复用
 
@@ -703,11 +749,10 @@ type CheckPrefix<T> = T extends '+' | '-' ? T : never;
 type CheckSuffix<T> =  T extends `${infer P}%` ? [P, '%'] : [T, ''];
 type PercentageParser<A extends string> = 
 A extends `${CheckPrefix<infer L>}${infer R}` 
-	? [L, ...CheckSuffix<R>] 
-	: ['', ...CheckSuffix<A>];
+	? [L, ...CheckSuffix<R>] : ['', ...CheckSuffix<A>];
 ```
 
-## DropChar
+## 2070 DropChar
 
 - 字符串匹配时L与R都可能为空字符串’’，若都可以匹配则L优先匹配最左边第一个字符，R匹配剩下的(可以是’’)
 
@@ -720,7 +765,7 @@ type DropChar<S extends string, C extends string> =
 S extends `${infer L}${C}${infer R}` ? DropChar<`${L}${R}`, C> : S
 ```
 
-## MinusOne
+## 2257 MinusOne
 
 ```tsx
  //示例
@@ -738,18 +783,18 @@ T extends `0${infer L}`
   : T extends `${infer R extends number}` ? R : never
 
 type DigsNext<S = '0123456789', Res = {}> = 
-  S extends `${infer L}${infer M}${infer R}`
-    ? DigsNext<`${M}${R}`, Res & Record<L, M>> : Omit<Res, never>
+S extends `${infer L}${infer M}${infer R}`
+  ? DigsNext<`${M}${R}`, Res & Record<L, M>> : Omit<Res, never>
 type DigsPrev = {[K in keyof DigsNext as DigsNext[K]]: K}
 
 type AddOne<A extends string, Res extends string = ""> = 
-  A extends `${infer L}${infer R}` 
-    ? L extends keyof DigsNext ? `${Res}${DigsNext[L]}${R}` : AddOne<R, `${Res}0`>
-    : `${Res}1`
+A extends `${infer L}${infer R}` 
+  ? L extends keyof DigsNext ? `${Res}${DigsNext[L]}${R}` : AddOne<R, `${Res}0`>
+  : `${Res}1`
 type SubOne<A extends string, Res extends string = ""> = 
-  A extends `${infer L}${infer R}`
-    ? L extends keyof DigsPrev ? `${Res}${DigsPrev[L]}${R}` : SubOne<R, `${Res}9`>
-    : never
+A extends `${infer L}${infer R}`
+  ? L extends keyof DigsPrev ? `${Res}${DigsPrev[L]}${R}` : SubOne<R, `${Res}9`>
+  : never
 
 type MinusOne<T extends number> = 
 ToNumber<
@@ -758,7 +803,7 @@ ToNumber<
 >
 ```
 
-## PickByType / OmitByType
+## 2595 2852 PickByType / OmitByType
 
 - as 再加层判断即可
 
@@ -788,7 +833,7 @@ type OmitByType<T extends object, U> = {
 }
 ```
 
-## StartsWith / **EndsWith**
+## 2688 2693 StartsWith / **EndsWith**
 
 ```tsx
  //示例
@@ -801,11 +846,13 @@ type b = EndsWith<'abc', 'abc'> // expected to be true
 type c = EndsWith<'abc', 'd'> // expected to be false
 
 //实现
-type StartsWith<T extends string, U extends string> = T extends `${U}${infer Rest}` ? true : false;
-type EndsWith<T extends string, U extends string> = T extends `${infer Rest}${U}` ? true : false;
+type StartsWith<T extends string, U extends string> = 
+T extends `${U}${infer Rest}` ? true : false;
+type EndsWith<T extends string, U extends string> = 
+T extends `${infer Rest}${U}` ? true : false;
 ```
 
-## PartialByKeys / RequiredByKeys
+## 2757 2759 PartialByKeys / RequiredByKeys
 
 - 使用泛型参数U进行保存以便复用
 - `Omit<T, K> & Partial<Pick<T, K>` 虽然能达到效果，但交叉类型与普通interface不同，需要再map一下成interface
@@ -844,7 +891,7 @@ type RequiredByKeys<
 }
 ```
 
-## Mutable
+## 2793 Mutable
 
 - -号的应用
 
@@ -864,7 +911,7 @@ type Mutable<T extends object> = {
 }
 ```
 
-## ObjectEntries
+## 2946 ObjectEntries
 
 ```tsx
  //示例
@@ -886,7 +933,7 @@ U extends keyof T
   : never;
 ```
 
-## TupleToNestedObject
+## 3188 TupleToNestedObject
 
 ```tsx
  //示例
@@ -896,12 +943,13 @@ type c = TupleToNestedObject<[], boolean>
 // boolean. if the tuple is empty, just return the U type
 
 //实现
-type TupleToNestedObject<T extends any[], U> = T extends [infer L extends PropertyKey, ...infer R] ? {
+type TupleToNestedObject<T extends any[], U> = 
+T extends [infer L extends PropertyKey, ...infer R] ? {
   [p in L]: TupleToNestedObject<R, U>
 } : U;
 ```
 
-## Reverse
+## 3192 Reverse
 
 ```tsx
  //示例
@@ -909,10 +957,11 @@ type a = Reverse<['a', 'b']> // ['b', 'a']
 type b = Reverse<['a', 'b', 'c']> // ['c', 'b', 'a']
 
 //实现
-type Reverse<T extends any[]> = T extends [infer L, ...infer R] ? [...Reverse<R>, L] : []
+type Reverse<T extends any[]> = 
+T extends [infer L, ...infer R] ? [...Reverse<R>, L] : []
 ```
 
-## FlipArguments
+## 3196 FlipArguments
 
 ```tsx
  //示例
@@ -920,11 +969,15 @@ type Flipped = FlipArguments<(arg0: string, arg1: number, arg2: boolean) => void
 // (arg0: boolean, arg1: number, arg2: string) => void
 
 //实现
-type Reverse<T extends any[]> = T extends [infer L, ...infer R] ? [...Reverse<R>, L] : []
-type FlipArguments<T extends (...args: any[])=>any> = T extends (...args: infer U) => infer R ? (...args: Reverse<U>) => R : never;
+type Reverse<T extends any[]> = 
+T extends [infer L, ...infer R] ? [...Reverse<R>, L] : []
+
+type FlipArguments<T extends (...args: any[])=>any> = 
+T extends (...args: infer U) => infer R 
+	? (...args: Reverse<U>) => R : never;
 ```
 
-## FlattenDepth
+## 3243 FlattenDepth
 
 ```tsx
  //示例
@@ -944,7 +997,7 @@ D extends 0
     : T
 ```
 
-## BEM
+## 3326 BEM
 
 - 联合类型在模板字符串中会将不同的模板字符串组成联合类型
     
@@ -963,14 +1016,14 @@ BEM<'btn', [], ['small', 'medium', 'large']>
 
 //实现
 type BEM<B extends string, E extends string[], M extends string[]> =
-  E['length'] extends 0 
-    ? M['length'] extends 0 ? B : `${B}--${M[number]}` 
-    : M['length'] extends 0 
-			? `${B}__${E[number]}` 
-			: `${B}__${E[number]}--${M[number]}`
+`${B}${
+	E['length'] extends 0 ? '' : `__${E[number]}`
+}${
+	M['length'] extends 0 ? '' : `--${M[number]}`
+}`
 ```
 
-## InorderTraversal
+## 3376 InorderTraversal
 
 - `[T] extends [TreeNode]` 防止分布式条件类型，否则虽然可以工作，但TS报错：Type instantiation is excessively deep and possibly infinite.
 
@@ -999,7 +1052,7 @@ type InorderTraversal<T extends TreeNode | null> =
   : []
 ```
 
-## Flip
+## 4179 Flip
 
 - 使用record映射
 - any作为subType可以赋值给普通类型，如果是`T extends object` 或`T extends unknown` 会报错：Type 'T[p]' is not assignable to type 'string | number | bigint | boolean | null | undefined'.
@@ -1016,7 +1069,7 @@ type Flip<T extends Record<PropertyKey, any>> = {
 }
 ```
 
-## Fibonacci
+## 4182 Fibonacci
 
 - 利用元组长度进行计数，只适用于数据量小的情况
 
@@ -1036,23 +1089,21 @@ type Fibonacci<
   : Fibonacci<T, B, [...A, ...B], [1, ...Count]>;
 ```
 
-## AllCombinations
+## 4260 AllCombinations
 
 ```tsx
  //示例
 type AllCombinations_ABC = AllCombinations<'ABC'>;
-// should be '' | 'A' | 'B' | 'C' | 'AB' | 'AC' | 'BA' | 'BC' | 'CA' | 'CB' | 'ABC' | 'ACB' | 'BAC' | 'BCA' | 'CAB' | 'CBA'
+// '' | 'A' | 'B' | 'C' | 'AB' | 'AC' | 'BA' | 'BC' | 'CA' | 'CB' | 'ABC' | 'ACB' | 'BAC' | 'BCA' | 'CAB' | 'CBA'
 
 //实现
 type AllCombinations<S, T extends string = "", U extends string = T> =
 S extends `${infer L}${infer R extends string}`
   ? AllCombinations<R, T | L>
-  : T extends "" 
-    ? "" 
-    : `${T}${AllCombinations<"", U extends T ? "" : U>}`;
+  : T extends "" ? "" : `${T}${AllCombinations<"", U extends T ? "" : U>}`;
 ```
 
-## Greater Than
+## 4425 Greater Than
 
 ```tsx
  //示例
@@ -1086,7 +1137,7 @@ NumberLength<T> extends NumberLength<U>
   :  GreaterThan<NumberLength<T>, NumberLength<U>>
 ```
 
-## Zip
+## 4471 Zip
 
 ```tsx
  //示例
@@ -1096,13 +1147,11 @@ type exp2 = Zip<[1, 2, 3], ['1', '2']> // [[1, '1'], [2, '2']]
 //实现
 type Zip<T extends any[], U extends any[]> = 
 T extends [infer TL, ...infer TR]
-  ? U extends [infer UL, ...infer UR]
-    ? [[TL, UL], ...Zip<TR, UR>]
-    : []
+  ? U extends [infer UL, ...infer UR] ? [[TL, UL], ...Zip<TR, UR>] : []
   : []
 ```
 
-## IsTuple
+## 4484 IsTuple
 
 ```tsx
  //示例
@@ -1116,12 +1165,10 @@ type IsTuple<T extends readonly any[] | { length: number }> =
   ? false
   : number extends T['length']
     ? false
-    : T extends readonly any []
-      ? true
-      : false;
+    : T extends readonly any [] ? true : false;
 ```
 
-## Chunk
+## 4499 Chunk
 
 ```tsx
  //示例
@@ -1138,7 +1185,7 @@ T extends [infer First, ...infer Rest]
   : R['length'] extends 0 ? [] : [R]
 ```
 
-## Fill
+## 4518 Fill
 
 ```tsx
  //示例
@@ -1166,7 +1213,7 @@ T extends [infer F,...infer R]
   : T
 ```
 
-## Without
+## 5117 Without
 
 ```tsx
  //示例
@@ -1178,12 +1225,11 @@ type Res2 = Without<[2, 3, 2, 3, 2, 3, 2, 3], [2, 3]>; // []
 type Without<T extends any[], U> = 
 T extends [infer L, ...infer R]
   ? L extends (U extends any[] ? U[number] : U)
-      ? Without<R, U>
-      : [L, ...Without<R, U>]
+    ? Without<R, U> : [L, ...Without<R, U>]
   : T
 ```
 
-## Trunc
+## 5140 Trunc
 
 ```tsx
  //示例
@@ -1196,7 +1242,7 @@ type Trunc<T extends number | string> =
   : `${T}`
 ```
 
-## IndexOf / **LastIndexOf**
+## 5153 5317 IndexOf / **LastIndexOf**
 
 - 使用Equal是为了保证搜索为any等类型时可以正确匹配
 - LastIndexOf由于索引还是从左到右递增，所以前面数组长度即为返回的索引
@@ -1221,7 +1267,7 @@ T extends [...infer L, infer R]
   : -1;
 ```
 
-## Join
+## 5310 Join
 
 ```tsx
  //示例
@@ -1237,7 +1283,7 @@ T extends [infer L extends string | number, ...infer R]
   : ''
 ```
 
-## Unique
+## 5360 Unique
 
 ```tsx
  //示例
@@ -1264,7 +1310,7 @@ T extends [...infer L, infer R]
   : T
 ```
 
-## MapTypes
+## 5821 MapTypes
 
 ```tsx
  //示例
@@ -1282,7 +1328,7 @@ type MapTypes<T extends object, R extends { mapFrom: any; mapTo: any;}> = {
 }
 ```
 
-## ConstructTuple
+## 7544 ConstructTuple
 
 ```tsx
  //示例
@@ -1293,7 +1339,7 @@ type ConstructTuple<L extends number, T extends unknown[] = []> =
 T['length'] extends L ? T : ConstructTuple<L, [...T, unknown]>
 ```
 
-## NumberRange
+## 8640 NumberRange
 
 - 方法一直接逐个去除会因为递归深度过大报错，因此采用分布式条件类型
 - 方法二直接从低位开始构造联合
@@ -1332,7 +1378,7 @@ U['length'] extends H
 	: NumberRange<L, H, T | U['length'], [...U, 1]>
 ```
 
-## Combination
+## 8767 Combination
 
 ```tsx
  //示例
@@ -1344,7 +1390,7 @@ type Combination<T extends string[], U = T[number], V = U> =
 U extends string ? U | `${U} ${Combination<T, Exclude<V, U>>}` : never
 ```
 
-## Subsequence
+## 8987 Subsequence
 
 ```tsx
  //示例
@@ -1362,7 +1408,7 @@ T extends [infer L, ...infer R]
 	: T
 ```
 
-## CheckRepeatedChars
+## 9142 CheckRepeatedChars
 
 ```tsx
  //示例
@@ -1381,7 +1427,7 @@ T extends `${infer L}${infer R}`
   : false;
 ```
 
-## FirstUniqueCharIndex
+## 9286 FirstUniqueCharIndex
 
 ```tsx
  //示例
@@ -1397,7 +1443,20 @@ T extends `${infer L}${infer R}`
   : -1;
 ```
 
-## GetMiddleElement
+## 9616 ParseUrlParams
+
+```tsx
+// 示例
+ParseUrlParams<':id'> // 'id'
+ParseUrlParams<'posts/:id/:user/like'> // 'id' | 'user'
+
+// 实现
+type ParseUrlParams<T extends string, Res = never> = 
+`${T}/` extends `${string}:${infer L}/${infer R}`
+  ? ParseUrlParams<R, L | Res> : Res
+```
+
+## 9896 GetMiddleElement
 
 ```tsx
  //示例
@@ -1411,7 +1470,7 @@ T extends [infer L, ...infer M, infer R]
   : T
 ```
 
-## FindEles
+## 9898 FindEles
 
 ```tsx
  //示例
@@ -1424,7 +1483,37 @@ T extends [infer L, ...infer R]
   : T
 ```
 
-## Integer
+## 9989 CountElementNumberToObject
+
+```tsx
+// 示例
+CountElementNumberToObject<[1,2,3,4,5,[1,2,3]]> 
+/**
+{
+  1: 2,
+  2: 2,
+  3: 2,
+  4: 1,
+}
+ */
+
+// 实现
+type CountToObjArr<T, Res extends Record<PropertyKey, 1[]> = {}> = 
+T extends [infer L extends (PropertyKey | unknown[]), ...infer R]
+  ? CountToObjArr<R, L extends PropertyKey
+      ? L extends keyof Res 
+        ? Omit<Res, L> & Record<L, [...Res[L], 1]> 
+        : Res & Record<L, [1]>
+      : CountToObjArr<L, Res>
+    >
+  : Res
+
+type CountElementNumberToObject<
+  T, Res extends Record<PropertyKey, 1[]> = CountToObjArr<T>
+> = [Res] extends [never] ? {} : { [p in keyof Res]: Res[p]['length'] }
+```
+
+## 10969 Integer
 
 ```tsx
  //示例
@@ -1440,7 +1529,7 @@ type Integer<T extends number> =
 type Integer<T extends number> = `${T}` extends `${bigint}` ? T : never
 ```
 
-## ToPrimitive
+## 16259 ToPrimitive
 
 - boolean需要特判，否则在分布式条件类型中解析为`true | false`
 
@@ -1485,7 +1574,7 @@ P = string | number | null | undefined | symbol | bigint
 }
 ```
 
-## All
+## 18142 All
 
 ```tsx
  //示例
@@ -1502,10 +1591,10 @@ T extends [infer L, ...infer R]
   : true
 ```
 
-## Filter
+## 18220 Filter
 
 ```tsx
- //示例
+//示例
 type res = Filter<[0, 1, 2] // 0 | 1
 
 //实现
@@ -1515,7 +1604,28 @@ T extends [infer L, ...infer R]
   : T
 ```
 
-## Combs
+## 21104 FindAll
+
+```tsx
+// 示例
+FindAll<'AAAA', 'AA'> // [0, 1, 2]
+FindAll<'abc def', ''> // []
+
+// 实现
+type FindAll<
+  T extends string, P extends string,
+  Cnt extends 0[] = [], R extends number[] = [],
+> = 
+P extends '' 
+  ? [] 
+  : T extends `${string}${infer L}` ?
+    FindAll<L, P, [...Cnt, 0], 
+      T extends `${P}${string}` ? [...R, Cnt['length']] : R
+    >
+  : R
+```
+
+## 21106 Combs
 
 ```tsx
  //示例
@@ -1526,11 +1636,10 @@ type a = Combs<['cmd', 'ctrl', 'opt', 'fn']>
 //实现
 type Combs<T extends string[], P = never> = 
 T extends [infer L extends string, ...infer R extends string[]]
-  ? Combs<R, P | `${L} ${R[number]}`>
-  : P
+  ? Combs<R, P | `${L} ${R[number]}`> : P
 ```
 
-## ReplaceFirst
+## 25170 ReplaceFirst
 
 ```tsx
  //示例
@@ -1543,7 +1652,7 @@ T extends readonly [infer L, ...infer R]
   : T;
 ```
 
-## Transpose
+## 25270 Transpose
 
 - 非递归法`X extends keyof M[Y]` 让`M[Y}[X]`顺利执行
 - 若不需改动数组长度的情况下可以直接用map产生数组
@@ -1594,7 +1703,7 @@ M extends []
     : Transpose<M, [...R, GetIdxValByRows<M, R['length']>]>
 ```
 
-## JSONSchema2TS
+## 26401 JSONSchema2TS
 
 ```tsx
  //示例
@@ -1654,7 +1763,7 @@ T extends { type: 'object' }
           : T extends { type: 'boolean' } ? boolean : T
 ```
 
-## Square
+## 27133 Square
 
 - 要通过100的样例需要实现Extreme的Multiply
 
@@ -1665,7 +1774,8 @@ type a = Square<100> // 10000
 //实现
 type Multiply = ... 
 
-type ToNumber<S extends string> = S extends `${infer N extends number}` ? N : never
+type ToNumber<S extends string> = 
+S extends `${infer N extends number}` ? N : never
 
 type Absolute<N extends number> = 
 `${N}` extends `-${infer R extends number}` ? R : N;
@@ -1673,7 +1783,7 @@ type Absolute<N extends number> =
 type Square<N extends number> = ToNumber<Multiply<Absolute<N>, Absolute<N>>>
 ```
 
-## Triangular
+## 27152 Triangular
 
 ```tsx
  //示例
@@ -1685,7 +1795,7 @@ N extends Cnt['length']
   ? Res['length'] : Triangular<N, [...Cnt, 1], [...Res, ...Cnt, 1]>
 ```
 
-## CartesianProduct
+## 27862 CartesianProduct
 
 ```tsx
  //示例
@@ -1698,15 +1808,14 @@ T extends any
   ? U extends any ? [T, U] : never
   : never
 ```
-	
-## MergeAll
+
+## 27932 MergeAll
 
 ```tsx
  //示例
 type Foo = { a: 1; b: 2 }
 type Bar = { a: 2 }
 type Baz = { c: 3 }
-
 type Result = MergeAll<[Foo, Bar, Baz]> // { a: 1 | 2; b: 2; c: 3 }
 
 //实现
@@ -1717,8 +1826,8 @@ XS extends [infer L, ...infer R extends object[]]
     }>
   : Omit<Res, never>;
 ```
-	
-## CheckRepeatedTuple
+
+## 27958 CheckRepeatedTuple
 
 ```tsx
  //示例
@@ -1747,7 +1856,7 @@ T extends [infer L, ...infer R]
   : false
 ```
 
-## PublicType
+## 28333 PublicType
 
 ```tsx
  //示例
@@ -1759,7 +1868,7 @@ type PublicType<T extends object> = {
 }
 ```
 
-## ExtractToObject
+## 29650 ExtractToObject
 
 ```tsx
  //示例
@@ -1771,7 +1880,7 @@ type ExtractToObject<T extends Object, U extends keyof T> =
 Omit<T[U] & Omit<T, U>, never>
 ```
 
-## DeepOmit
+## 29785 DeepOmit
 
 ```tsx
  //示例
@@ -1796,7 +1905,7 @@ K extends `${infer L}.${infer R}`
   : Omit<T, K>;
 ```
 
-## IsOdd
+## 30301 IsOdd
 
 ```tsx
  //示例
@@ -1808,7 +1917,7 @@ type IsOdd<T extends number> =
 `${T}` extends `${number | ''}${1 | 3 | 5 | 7 | 9}` ? true : false;
 ```
 
-## Hanoi
+## 30430 Hanoi
 
 ```tsx
 Hanoi<0> // []
@@ -1830,7 +1939,7 @@ type Hanoi<
     ]
 ```
 
-## Pascal
+## 30958 Pascal
 
 ```tsx
 Pascal<3>
@@ -1866,7 +1975,7 @@ Res['length'] extends N
 : Pascal<N, [...Cnt, 1], [...Res, GetArr<Res[Cnt['length']]>]>
 ```
 
-## IsFixedStringLiteralType
+## 30970 IsFixedStringLiteralType
 
 ```tsx
 IsFixedStringLiteralType<`ABC${boolean}`> // false
