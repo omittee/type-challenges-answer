@@ -1576,3 +1576,28 @@ type BinaryAdd<A extends Bit[], B extends Bit[], S extends Bit = 0, R extends Bi
     ? BinaryAdd<AR, BR, `${S}${X}${Y}` extends Shifts ? 1 : 0, [`${S}${X}${Y}` extends Ones ? 1 : 0, ...R]>
     : S extends 1 ? [1, ...R] : R;
 ```
+
+## 34286 Take
+
+```tsx
+ //示例
+BinaryAdd<[1], [1]> // [1, 0]
+BinaryAdd<[0], [1]> // [1]
+
+//实现
+type Reverse<Arr extends any[], Res extends any[] = []> =
+Arr extends [infer L, ...infer R] ? Reverse<R, [L, ...Res]> :Res
+
+type PosTake<
+  N extends number,
+  Arr extends any[],
+  Res extends any[] = []
+> = Res['length'] extends N
+? Res : Arr extends [infer L, ...infer R]
+? PosTake<N, R, [...Res, L]>
+: Res;
+
+type Take<N extends number, Arr extends any[]> = 
+`${N}` extends `-${infer T extends number}`
+? Reverse<PosTake<T, Reverse<Arr>>> : PosTake<N, Arr>
+```
