@@ -1997,3 +1997,19 @@ type IsFixedStringLiteralType<S extends string, T = S> = [S] extends [never]
       ? SingleCheck<S> : false
     : false;
 ```
+
+## 34007 CompareArrayLength
+
+```tsx
+CompareArrayLength<[1, 2, 3, 4], [5, 6]> // 1
+CompareArrayLength<[1, 2], [3, 4, 5, 6]> // -1
+CompareArrayLength<[1, 2, 3], [4, 5, 6]> // 0
+
+//实现
+type CompareArrayLength<T extends any[], U extends any[]> = 
+T extends [infer A, ...infer B]
+? U extends [infer X, ...infer Y]
+  ? CompareArrayLength<B, Y>
+  : 1
+: U extends [infer X, ...infer Y] ? -1 : 0
+```
