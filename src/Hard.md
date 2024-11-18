@@ -1577,6 +1577,42 @@ type BinaryAdd<A extends Bit[], B extends Bit[], S extends Bit = 0, R extends Bi
     : S extends 1 ? [1, ...R] : R;
 ```
 
+## 33763 UnionToObjectFromKey
+
+```tsx
+ //示例
+type Foo = {
+  foo: string
+  common: boolean
+}
+
+type Bar = {
+  bar: number
+  common: boolean
+}
+
+type Other = {
+  other: string
+}
+
+UnionToObjectFromKey<Foo | Bar | Other, 'common'> 
+/*
+{
+  foo: string
+  common: boolean
+} | {
+  bar: number
+  common: boolean
+}
+*/
+
+//实现
+type UnionToObjectFromKey<Union, Key> = 
+Union extends any
+? Key extends keyof Union ? Union : never 
+: never
+```
+
 ## 34286 Take
 
 ```tsx
@@ -1586,7 +1622,7 @@ BinaryAdd<[0], [1]> // [1]
 
 //实现
 type Reverse<Arr extends any[], Res extends any[] = []> =
-Arr extends [infer L, ...infer R] ? Reverse<R, [L, ...Res]> :Res
+Arr extends [infer L, ...infer R] ? Reverse<R, [L, ...Res]> : Res
 
 type PosTake<
   N extends number,
