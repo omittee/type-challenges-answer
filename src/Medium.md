@@ -2013,3 +2013,81 @@ T extends [infer A, ...infer B]
   : 1
 : U extends [infer X, ...infer Y] ? -1 : 0
 ```
+
+## 34857 DefinedPartial
+
+```tsx
+type A2 = Record<'a' | 'b' | 'c', string>
+type E2 = { a: string } |
+  { b: string } |
+  { c: string } |
+  { a: string, b: string } |
+  { a: string, c: string } |
+  { b: string, c: string } |
+  { a: string, b: string, c: string }
+type D2 = DefinedPartial<A2>
+type C2 = Expect<Equal<D2, E2>>
+
+// 实现
+type DefinedPartial<T, K extends keyof T = keyof T> = K extends unknown
+  ? T | DefinedPartial<Omit<T, K>>
+  : never;
+```
+
+## 35045 LongestCommonPrefix
+
+```tsx
+LongestCommonPrefix<['flower', 'flow', 'flight']> // 'fl'
+LongestCommonPrefix<['flower', 'flow', '']> // ''
+LongestCommonPrefix<['flower']> // 'flower'
+LongestCommonPrefix<[]> // ''
+
+// 实现
+type GetPreFix<A extends string, B extends string, Res extends string = ''> = 
+A extends `${infer AL}${infer AR}`
+  ? B extends `${AL}${infer BR}` ? GetPreFix<AR, BR, `${Res}${AL}`> : Res
+  : Res;
+
+type LongestCommonPrefix<T extends string[]> = 
+T extends [infer TL extends string, infer TM extends string, ...infer TR extends string[]]
+  ? LongestCommonPrefix<[GetPreFix<TL, TM>, ...TR]>
+  : T['length'] extends 0 ? '' : T[0];
+  
+// 实现
+type LongestCommonPrefix<T extends string[], P extends string = ''> = 
+T extends [`${P}${infer Next}${any}`, ...any]
+  ? T extends `${P}${Next}${any}`[]
+    ? LongestCommonPrefix<T, `${P}${Next}`> : P
+  : P
+```
+
+## 35191 Trace
+
+```tsx
+Trace<[[1, 2], [3, 4]] // 1 | 4
+Trace<[[0, 1, 1], [2, 0, 2], [3, 3, 0]] // 0
+Trace<[['a', 'b', ''], ['c', '', ''], ['d', 'e', 'f']] // 'a' | '' | 'f'
+
+// 实现
+type Trace<T extends any[][], Cnt extends 1[] = [], Res = never> = 
+Cnt['length'] extends T['length']
+ ? Res
+ : Trace<T, [...Cnt, 1], T[Cnt['length']][Cnt['length']] | Res>
+ 
+ // 实现
+ type Trace<T extends any[][]> = {[P in keyof T]: T[P][P & keyof T[P]]}[number]
+```
+
+## 35252 IsAlphabet
+
+```tsx
+IsAlphabet<'A'> // true
+IsAlphabet<'z'> // true
+IsAlphabet<'9'> // false
+IsAlphabet<'!'> // false
+IsAlphabet<'😂'> // false
+IsAlphabet<''> // false
+
+// 实现
+type IsAlphabet<S extends string> = Lowercase<S> extends Uppercase<S> ? false : true
+```
