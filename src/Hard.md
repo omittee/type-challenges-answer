@@ -1637,3 +1637,39 @@ type Take<N extends number, Arr extends any[]> =
 `${N}` extends `-${infer T extends number}`
 ? Reverse<PosTake<T, Reverse<Arr>>> : PosTake<N, Arr>
 ```
+
+## 35314 ValidSudoku
+
+```tsx
+ //示例
+ValidSudoku<[
+  [9, 5, 7, 8, 4, 6, 1, 3, 2],
+  [2, 3, 4, 5, 9, 1, 6, 7, 8],
+  [1, 8, 6, 7, 3, 2, 5, 4, 9],
+  [8, 9, 1, 6, 2, 3, 4, 5, 7],
+  [3, 4, 5, 9, 7, 8, 2, 6, 1],
+  [6, 7, 2, 1, 5, 4, 8, 9, 3],
+  [4, 6, 8, 3, 1, 9, 7, 2, 5],
+  [5, 2, 3, 4, 8, 7, 9, 1, 6],
+  [7, 1, 9, 2, 6, 5, 3, 8, 4],
+]> // true
+
+//实现
+type RN = [number];
+type R1 = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+type R3 = [0 | 1 | 2,  3 | 4 | 5,  6 | 7 | 8];
+type Values = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+
+type MapBool = {[N: number]: true; x: false};
+type MapX = {[N: number]: 'x'} & Record<Values, never>;
+type NotAllX<V extends number, D extends number = Values> = {[K in D]: MapX[K & V]}[D];
+
+type Check<
+  M extends number[][],
+  RI extends number[],
+  RJ extends number[]
+> = {[I in keyof RI]: {[J in keyof RJ]: NotAllX<M[RI[I]][RJ[J]]>}[number]}[number];
+
+type ValidSudoku<M extends number[][]> = 
+	MapBool[Check<M, R1, RN> | Check<M, RN, R1> | Check<M, R3, R3>];
+```
