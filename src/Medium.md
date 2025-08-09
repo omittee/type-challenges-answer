@@ -2091,3 +2091,44 @@ IsAlphabet<''> // false
 // 实现
 type IsAlphabet<S extends string> = Lowercase<S> extends Uppercase<S> ? false : true
 ```
+
+## 35991 MyUppercase
+
+```tsx
+MyUppercase<'A z h yy 😃cda\n\t  a   ' // 'A Z H YY 😃CDA\n\t  A   '
+
+// 实现
+interface Mapping {
+  a: 'A'
+  b: 'B'
+  c: 'C'
+  d: 'D'
+  e: 'E'
+  f: 'F'
+  g: 'G'
+  h: 'H'
+  i: 'I'
+  j: 'J'
+  k: 'K'
+  l: 'L'
+  m: 'M'
+  n: 'N'
+  o: 'O'
+  p: 'P'
+  q: 'Q'
+  r: 'R'
+  s: 'S'
+  t: 'T'
+  u: 'U'
+  v: 'V'
+  w: 'W'
+  x: 'X'
+  y: 'Y'
+  z: 'Z'
+}
+
+type MyUppercase<T extends string, Res extends string = ''> = 
+T extends `${infer L}${infer R}`
+  ? MyUppercase<R, `${Res}${L extends keyof Mapping ? Mapping[L] : L}`>
+  : Res
+```
